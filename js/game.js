@@ -168,6 +168,16 @@ function handleBoardSelection(row, col) {
   gameState.selectedPiece = { origin: 'board', player: topPiece.player, size: topPiece.size, row, col };
 }
 
+function isCurrentPlayerHoldingBoardPiece(row, col) {
+  const stack = gameState.board[row][col];
+  if (!stack.length) {
+    return false;
+  }
+
+  const topPiece = stack[stack.length - 1];
+  return topPiece.player === gameState.currentPlayer;
+}
+
 function attemptMove(targetRow, targetCol) {
   if (!gameState.selectedPiece || gameState.winner) {
     return;

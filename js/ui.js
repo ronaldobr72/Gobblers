@@ -46,6 +46,10 @@ function renderBoard() {
         }
       }
 
+      if (gameState.selectedPiece && gameState.selectedPiece.origin === 'board' && isCurrentPlayerHoldingBoardPiece(row, col)) {
+        cell.classList.add('selected');
+      }
+
       if (gameState.selectedPiece && gameState.selectedPiece.origin === 'board' && gameState.selectedPiece.row === row && gameState.selectedPiece.col === col) {
         cell.classList.add('selected');
       }
@@ -143,6 +147,12 @@ boardElement.addEventListener('click', (event) => {
       render();
       return;
     }
+  }
+
+  if (isCurrentPlayerHoldingBoardPiece(row, col)) {
+    handleBoardSelection(row, col);
+    render();
+    return;
   }
 
   handleBoardSelection(row, col);
