@@ -5,9 +5,23 @@ const scorePlayer1 = document.getElementById('score-player1');
 const scorePlayer2 = document.getElementById('score-player2');
 const turnIndicator = document.getElementById('turn-indicator');
 const nextMatchButton = document.getElementById('next-match-btn');
+const levelIndicator = document.getElementById('level-indicator');
+const modeButtons = [...document.querySelectorAll('.mode-btn')];
 
 function getPlayerClassName(player) {
   return player === 1 ? 'one' : 'two';
+}
+
+function pieceInnerHTML() {
+  return [
+    '<span class="piece-body" aria-hidden="true"></span>',
+    '<span class="piece-top" aria-hidden="true"></span>',
+    '<span class="piece-face" aria-hidden="true">',
+    '<span class="eye eye-left"></span>',
+    '<span class="eye eye-right"></span>',
+    '<span class="mouth"></span>',
+    '</span>'
+  ].join('');
 }
 
 function renderBoard() {
@@ -27,7 +41,7 @@ function renderBoard() {
       if (topPiece) {
         const pieceEl = document.createElement('div');
         pieceEl.className = `piece player-${getPlayerClassName(topPiece.player)} size-${topPiece.size}`;
-        pieceEl.textContent = topPiece.size;
+        pieceEl.innerHTML = pieceInnerHTML();
         pieceEl.style.top = '0px';
         pieceEl.style.zIndex = String(stack.length);
 
@@ -75,7 +89,7 @@ function renderReserves() {
       const piece = document.createElement('button');
       piece.type = 'button';
       piece.className = `piece player-${getPlayerClassName(Number(playerKey.replace('player', '')))} size-${size}`;
-      piece.textContent = size;
+      piece.innerHTML = pieceInnerHTML();
       piece.dataset.player = playerKey;
       piece.dataset.index = index;
       piece.dataset.size = size;
@@ -96,13 +110,32 @@ function renderScores() {
 
 function renderTurn() {
   if (gameState.winner) {
-    turnIndicator.textContent = `Player ${gameState.winner} wins!`;
+    if (gameState.gameMode === 'pvp') {
+      turnIndicator.textContent = `Player ${gameState.winner} wins!`;
+    } else {
+      turnIndicator.textContent = gameState.winner === 1 ? 'You win! 🎉' : 'Computer wins!';
+    }
     nextMatchButton.hidden = false;
     return;
   }
 
   nextMatchButton.hidden = true;
-  turnIndicator.textContent = `Player ${gameState.currentPlayer} turn`;
+  if (gameState.gameMode === 'pvp') {
+    turnIndicator.textContent = `Player ${gameState.currentPlayer} turn`;
+  } else if (gameState.currentPlayer === 1) {
+    turnIndicator.textContent = 'Your turn';
+  } else {
+    turnIndicator.textContent = 'Computer thinking...';
+  }
+}
+
+function renderLevel() {
+  if (gameState.gameMode === 'arcade') {
+    levelIndicator.hidden = false;
+    levelIndicator.textContent = `Level ${gameState.arcadeLevel}`;
+  } else {
+    levelIndicator.hidden = true;
+  }
 }
 
 function render() {
@@ -110,10 +143,11 @@ function render() {
   renderReserves();
   renderScores();
   renderTurn();
+  renderLevel();
 }
 
 nextMatchButton.addEventListener('click', () => {
-  initializeGame();
+  resetMatch();
   render();
 });
 
@@ -132,7 +166,7 @@ boardElement.addEventListener('click', (event) => {
 
     if (canMove && !isSameSourceCell) {
       attemptMove(row, col);
-      render();
+      afterMove();
       return;
     }
 
@@ -176,6 +210,75 @@ boardElement.addEventListener('click', (event) => {
 
     handleReserveSelection(player, index);
     render();
+  });
+});
+
+function resetMatch() {
+  gameState.currentPlayer = 1;
+  gameState.reserve = {
+    player1: [3, 3, 2, 2, 1, 1],
+    player2: [3, 3, 2, 2, 1, 1]
+  };
+  gameState.board = [
+    [[], [], []],
+    [[], [], []],
+    [[], [], []]
+  ];
+  gameState.selectedPiece = null;
+  gameState.winner = null;
+  gameState.winningLine = [];
+}
+
+function afterMove() {
+  if (gameState.winner && gameState.gameMode === 'arcade') {
+    if (gameState.winner === 1) {
+      gameState.arcadeLevel += 1;
+    } else {
+      gameState.arcadeLevel = 1;
+    }
+  }
+
+  render();
+
+  if (!gameState.winner && gameState.gameMode !== 'pvp' && gameState.currentPlayer === 2) {
+    setTimeout(() => {
+      const move = findBestMove(2, getCpuDifficulty());
+      applyComputerMove(move);
+      render();
+    }, 450);
+  }
+}
+
+function setMode(mode) {
+  modeButtons.forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+
+  gameState.gameMode = 'pvp';
+  gameState.cpuDifficulty = 'easy';
+  gameState.arcadeLevel = 1;
+
+  if (mode === 'cpu-easy') {
+    gameState.gameMode = 'cpu';
+    gameState.cpuDifficulty = 'easy';
+  } else if (mode === 'cpu-medium') {
+    gameState.gameMode = 'cpu';
+    gameState.cpuDifficulty = 'medium';
+  } else if (mode === 'cpu-hard') {
+    gameState.gameMode = 'cpu';
+    gameState.cpuDifficulty = 'hard';
+  } else if (mode === 'arcade') {
+    gameState.gameMode = 'arcade';
+    gameState.arcadeLevel = 1;
+  }
+
+  initializeGame();
+  render();
+}
+
+modeButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    setMode(btn.dataset.mode);
   });
 });
 

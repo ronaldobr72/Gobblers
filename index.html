@@ -22,6 +22,14 @@
         </div>
       </header>
 
+      <nav class="mode-bar" aria-label="Modo de jogo">
+        <button class="mode-btn active" data-mode="pvp" type="button">2 Jogadores</button>
+        <button class="mode-btn" data-mode="cpu-easy" type="button">CPU Fácil</button>
+        <button class="mode-btn" data-mode="cpu-medium" type="button">CPU Médio</button>
+        <button class="mode-btn" data-mode="cpu-hard" type="button">CPU Difícil</button>
+        <button class="mode-btn" data-mode="arcade" type="button">Arcade</button>
+      </nav>
+
       <main class="game-layout">
         <aside class="reserve reserve-left" id="reserve-player1"></aside>
 
@@ -33,6 +41,7 @@
       </main>
 
       <footer class="status-bar">
+        <div id="level-indicator" hidden></div>
         <div id="turn-indicator">Player 1 turn</div>
         <button id="next-match-btn" class="next-match-btn" type="button" hidden>Next Match</button>
       </footer>
