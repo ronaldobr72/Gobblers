@@ -427,6 +427,58 @@ function boardSignature(state) {
   return sig;
 }
 
+function getTransformations(board) {
+  const boards = [];
+  
+  function rotate90(grid) {
+    const nextGrid = [[], [], []];
+    for (let r = 0; r < 3; r++) {
+      for (let c = 0; c < 3; c++) {
+        nextGrid[c][2 - r] = grid[r][c];
+      }
+    }
+    return nextGrid;
+  }
+  
+  function reflectH(grid) {
+    const nextGrid = [[], [], []];
+    for (let r = 0; r < 3; r++) {
+      nextGrid[r] = [grid[r][2], grid[r][1], grid[r][0]];
+    }
+    return nextGrid;
+  }
+
+  let current = board;
+  const rotations = [];
+  for (let i = 0; i < 4; i++) {
+    rotations.push(current);
+    current = rotate90(current);
+  }
+
+  for (const rot of rotations) {
+    boards.push(rot);
+    boards.push(reflectH(rot));
+  }
+
+  return boards;
+}
+
+function getSymmetricSignatures(state) {
+  const transformations = getTransformations(state.board);
+  const signatures = new Set();
+
+  for (const transBoard of transformations) {
+    const tempState = {
+      currentPlayer: state.currentPlayer,
+      board: transBoard,
+      reserve: state.reserve
+    };
+    signatures.add(boardSignature(tempState));
+  }
+
+  return Array.from(signatures);
+}
+
 function moveScore(move, state, player) {
   let s = 0;
   if (move.to.row === 1 && move.to.col === 1) {
@@ -452,8 +504,11 @@ function orderMoves(moves, state, player) {
 
 function learnFromResult(winner) {
   if (winner === 1) {
-    for (const sig of aiMoveHistory) {
-      lossMemory[sig] = (lossMemory[sig] || 0) + 1;
+    for (const stateObj of aiMoveHistory) {
+      const symSigs = getSymmetricSignatures(stateObj);
+      for (const sig of symSigs) {
+        lossMemory[sig] = (lossMemory[sig] || 0) + 1;
+      }
     }
     const keys = Object.keys(lossMemory);
     if (keys.length > 2000) {
@@ -591,7 +646,7 @@ function findBestMove(aiPlayer, level) {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  const depth = level === 'impossible' ? 6 : (level === 'hard' ? 4 : 2);
+  const depth = level === 'impossible' ? 8 : (level === 'hard' ? 4 : 2);
   let bestMove = moves[0];
   let bestScore = -Infinity;
 
@@ -638,7 +693,7 @@ function applyComputerMove(move) {
 
   if (gameState.gameMode !== 'pvp') {
     const nextState = applyMoveState(gameState, move);
-    aiMoveHistory.push(boardSignature(nextState));
+    aiMoveHistory.push(cloneState(nextState));
   }
 
   if (move.origin === 'reserve') {
