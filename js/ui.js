@@ -267,6 +267,9 @@ function setMode(mode) {
   } else if (mode === 'cpu-hard') {
     gameState.gameMode = 'cpu';
     gameState.cpuDifficulty = 'hard';
+  } else if (mode === 'cpu-impossible') {
+    gameState.gameMode = 'cpu';
+    gameState.cpuDifficulty = 'impossible';
   } else if (mode === 'arcade') {
     gameState.gameMode = 'arcade';
     gameState.arcadeLevel = 1;

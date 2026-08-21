@@ -591,7 +591,7 @@ function findBestMove(aiPlayer, level) {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  const depth = level === 'hard' ? 4 : 2;
+  const depth = level === 'impossible' ? 6 : (level === 'hard' ? 4 : 2);
   let bestMove = moves[0];
   let bestScore = -Infinity;
 
@@ -616,7 +616,10 @@ function getCpuDifficulty() {
     if (level === 2) {
       return 'medium';
     }
-    return 'hard';
+    if (level === 3) {
+      return 'hard';
+    }
+    return 'impossible';
   }
   return gameState.cpuDifficulty;
 }

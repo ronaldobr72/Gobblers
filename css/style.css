@@ -41,6 +41,21 @@ button {
   margin-bottom: 20px;
 }
 
+.logo-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.game-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
 h1 {
   margin: 0;
   font-size: clamp(2rem, 4vw, 3rem);
