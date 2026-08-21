@@ -597,7 +597,14 @@ function findBestMove(aiPlayer, level) {
 
   for (const move of moves) {
     const next = applyMoveState(gameState, move);
-    const score = minimax(next, depth - 1, -Infinity, Infinity, false, aiPlayer);
+    let score = minimax(next, depth - 1, -Infinity, Infinity, false, aiPlayer);
+    
+    // Penalize moves that result in historically losing board layouts
+    const penalty = lossMemory[boardSignature(next)] || 0;
+    if (penalty) {
+      score -= penalty * 5000;
+    }
+
     if (score > bestScore) {
       bestScore = score;
       bestMove = move;
@@ -630,7 +637,8 @@ function applyComputerMove(move) {
   }
 
   if (gameState.gameMode !== 'pvp') {
-    aiMoveHistory.push(boardSignature(gameState));
+    const nextState = applyMoveState(gameState, move);
+    aiMoveHistory.push(boardSignature(nextState));
   }
 
   if (move.origin === 'reserve') {

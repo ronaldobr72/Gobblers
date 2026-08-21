@@ -14,12 +14,15 @@ function getPlayerClassName(player) {
 
 function pieceInnerHTML() {
   return [
+    '<span class="piece-hair" aria-hidden="true"></span>',
     '<span class="piece-body" aria-hidden="true"></span>',
     '<span class="piece-top" aria-hidden="true"></span>',
     '<span class="piece-face" aria-hidden="true">',
-    '<span class="eye eye-left"></span>',
-    '<span class="eye eye-right"></span>',
-    '<span class="mouth"></span>',
+    '<div class="eyes-container">',
+    '<span class="eye eye-left" aria-hidden="true"></span>',
+    '<span class="eye eye-right" aria-hidden="true"></span>',
+    '</div>',
+    '<span class="mouth" aria-hidden="true"></span>',
     '</span>'
   ].join('');
 }
