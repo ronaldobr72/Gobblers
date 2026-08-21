@@ -270,12 +270,17 @@ function setMode(mode) {
   } else if (mode === 'cpu-hard') {
     gameState.gameMode = 'cpu';
     gameState.cpuDifficulty = 'hard';
-  } else if (mode === 'cpu-impossible') {
+  } else if (mode === 'cpu-challenge') {
     gameState.gameMode = 'cpu';
-    gameState.cpuDifficulty = 'impossible';
+    gameState.cpuDifficulty = 'challenge';
   } else if (mode === 'arcade') {
     gameState.gameMode = 'arcade';
     gameState.arcadeLevel = 1;
+  }
+
+  const engineSettingsEl = document.getElementById('engine-settings');
+  if (engineSettingsEl) {
+    engineSettingsEl.hidden = (mode !== 'cpu-challenge');
   }
 
   initializeGame();
@@ -287,6 +292,17 @@ modeButtons.forEach((btn) => {
     setMode(btn.dataset.mode);
   });
 });
+
+const engineDepthInput = document.getElementById('engine-depth');
+const depthValueEl = document.getElementById('depth-value');
+if (engineDepthInput) {
+  engineDepthInput.addEventListener('input', () => {
+    const val = engineDepthInput.value;
+    depthValueEl.textContent = val;
+    gameState.engineDepth = Number(val);
+  });
+  gameState.engineDepth = Number(engineDepthInput.value);
+}
 
 initializeGame();
 render();

@@ -27,9 +27,14 @@
         <button class="mode-btn" data-mode="cpu-easy" type="button">CPU Fácil</button>
         <button class="mode-btn" data-mode="cpu-medium" type="button">CPU Médio</button>
         <button class="mode-btn" data-mode="cpu-hard" type="button">CPU Difícil</button>
-        <button class="mode-btn" data-mode="cpu-impossible" type="button">CPU Impossível</button>
+        <button class="mode-btn" data-mode="cpu-challenge" type="button">Engine Challenge</button>
         <button class="mode-btn" data-mode="arcade" type="button">Arcade</button>
       </nav>
+
+      <div id="engine-settings" class="engine-settings-bar" hidden>
+        <label for="engine-depth">Engine Depth: <span id="depth-value">8</span></label>
+        <input type="range" id="engine-depth" min="5" max="12" value="8" step="1" />
+      </div>
 
       <main class="game-layout">
         <aside class="reserve reserve-left" id="reserve-player1"></aside>

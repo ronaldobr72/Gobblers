@@ -15,7 +15,8 @@ const gameState = {
   winningLine: [],
   gameMode: 'pvp',
   cpuDifficulty: 'easy',
-  arcadeLevel: 1
+  arcadeLevel: 1,
+  engineDepth: 8
 };
 
 function initializeGame() {
@@ -34,6 +35,11 @@ function initializeGame() {
   gameState.winner = null;
   gameState.winningLine = [];
   aiMoveHistory = [];
+
+  const depthEl = document.getElementById('engine-depth');
+  if (depthEl) {
+    gameState.engineDepth = Number(depthEl.value);
+  }
 }
 
 function getTopPieceFromCell(row, col) {
@@ -646,7 +652,7 @@ function findBestMove(aiPlayer, level) {
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  const depth = level === 'impossible' ? 8 : (level === 'hard' ? 4 : 2);
+  const depth = level === 'challenge' ? gameState.engineDepth : (level === 'hard' ? 4 : 2);
   let bestMove = moves[0];
   let bestScore = -Infinity;
 
@@ -681,7 +687,7 @@ function getCpuDifficulty() {
     if (level === 3) {
       return 'hard';
     }
-    return 'impossible';
+    return 'challenge';
   }
   return gameState.cpuDifficulty;
 }
